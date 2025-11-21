@@ -1,3 +1,4 @@
+1366ca7 Task 2.3 Remove Play parameter from helper methods and use getPlay
 28f059e Task 2.2 Extract getVolumeCredits
 9869a95 Task 2.1 Extract getAmount method
 db0ad02 Task 1.2 Add commit log

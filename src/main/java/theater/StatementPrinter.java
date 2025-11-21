@@ -23,35 +23,24 @@ public class StatementPrinter {
      * @throws RuntimeException if one of the play types is not known
      */
     public String statement() {
-        int totalAmount = 0;
-        int volumeCredits = 0;
-        final StringBuilder result =
-                new StringBuilder(String.format("Statement for %s%n", invoice.getCustomer()));
+        final StatementData data = createStatementData();
 
         final NumberFormat frmt = NumberFormat.getCurrencyInstance(Locale.US);
+        final StringBuilder result =
+                new StringBuilder(String.format("Statement for %s%n", data.getCustomer()));
 
-        for (Performance performance : invoice.getPerformances()) {
-            final Play play = getPlay(performance);
-
-            // thisAmount never changes → declare final
-            final int thisAmount = getAmount(performance);
-
-            // add volume credits
-            volumeCredits += getVolumeCredits(performance);
-
-            // print line for this order
+        for (PerformanceData perf : data.getPerformances()) {
             result.append(String.format("  %s: %s (%s seats)%n",
-                    play.getName(),
-                    frmt.format(thisAmount / Constants.PERCENT_FACTOR),
-                    performance.getAudience()));
-
-            totalAmount += thisAmount;
+                    perf.getPlayName(),
+                    frmt.format(perf.getAmount() / Constants.PERCENT_FACTOR),
+                    perf.getAudience()));
         }
 
         result.append(String.format(
-                "Amount owed is %s%n", frmt.format(totalAmount / Constants.PERCENT_FACTOR)));
+                "Amount owed is %s%n", frmt.format(data.getTotalAmount() / Constants.PERCENT_FACTOR)));
         result.append(String.format(
-                "You earned %s credits%n", volumeCredits));
+                "You earned %s credits%n", data.getVolumeCredits()));
+
         return result.toString();
     }
 
@@ -103,5 +92,35 @@ public class StatementPrinter {
         }
 
         return result;
+    }
+
+    private StatementData createStatementData() {
+        final StatementData data = new StatementData();
+        data.setCustomer(invoice.getCustomer());
+
+        int totalAmount = 0;
+        int volumeCredits = 0;
+
+        for (Performance performance : invoice.getPerformances()) {
+            final PerformanceData perfData = new PerformanceData();
+            final Play play = getPlay(performance);
+
+            perfData.setPlayName(play.getName());
+            perfData.setPlayType(play.getType());
+            perfData.setAudience(performance.getAudience());
+
+            final int thisAmount = getAmount(performance);
+            perfData.setAmount(thisAmount);
+
+            totalAmount += thisAmount;
+            volumeCredits += getVolumeCredits(performance);
+
+            data.getPerformances().add(perfData);
+        }
+
+        data.setTotalAmount(totalAmount);
+        data.setVolumeCredits(volumeCredits);
+
+        return data;
     }
 }
