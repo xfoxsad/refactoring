@@ -3,6 +3,11 @@ package theater;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Aggregated data used when printing an invoice statement.
+ *
+ * @null This class has no representation invariants.
+ */
 public class StatementData {
 
     private String customer;

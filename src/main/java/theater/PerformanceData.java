@@ -1,5 +1,10 @@
 package theater;
 
+/**
+ * Data for a single performance in a statement.
+ *
+ * @null This class has no representation invariants.
+ */
 public class PerformanceData {
 
     private String playName;
